@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% load widget_tweaks %}
+
+{% block title %} Registro | {{ block.super }} {% endblock %}
+
+{% block container %}
+<div class="row">
+    <div class="col-md-10 col-md-offset-2 text-center mx-auto">
+        <h1 class="h3 mb-3 font-weight-normal">Por favor, registre-se</h1>
+        <form class="form-signin" method="post">
+            {% csrf_token %}
+            {% for error in form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ error }}
+            </div>
+            {% endfor %}
+            <fieldset>
+                {% for field in form %}
+                <div class="form-group{% if field.errors %} has-error{% endif %}">
+                  <label hidden for="{{ field.auto_id }}">{{ field.label }}</label>
+                  <div>
+                    {% render_field field class="form-control" placeholder=field.label %}
+                    {% for error in field.errors %}
+                    <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                  </div>
+                </div>
+                {% endfor %}
+                <div class="form-group">
+                  <div class="col-md-offset-3">
+                    <button type="submit" class="btn btn-primary btn-block">Registrar</button>
+                  </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</div>
+{% endblock %}

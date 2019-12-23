@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ product }} | {{ block.super }}
+{% endblock %}
+
+{% block container %}
+
+<div class="page-header">
+  <h1>{{ product }}</h1>
+</div>
+<div class="row">
+  <div class="col-sm-4">
+      <a href="#" class="thumbnail">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" />
+          {% else %}
+            <img src="http://placehold.it/350x250" alt="" />
+          {% endif %}
+      </a>
+  </div>
+  <div class="col-sm-8">
+      <dl>
+        <dd>{{ product.short_description|linebreaks }}</dd>
+        <dd>{{ product.description|linebreaks }}</dd>
+        <dd>Preço: {{ product.price }}</dd>
+        <dd>Em Estoque: {{ product.stock }}</dd>
+        </br>
+        <p><a href="{% url 'checkout:create-cartitem' product.slug %}" class="btn btn-default" role="button">Adicionar</a></p>
+      </dl>
+  </div>
+</div>
+
+{% endblock %}
