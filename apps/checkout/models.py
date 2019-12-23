@@ -123,7 +123,7 @@ class Order(models.Model):
         }
         pg.reference_prefix = ''
         pg.shipping = {
-            "type": 2,
+            "type": 1,
             "street": "Av Brig Faria Lima",
             "number": 1234,
             "complement": "5 andar",
@@ -132,7 +132,6 @@ class Order(models.Model):
             "city": "Sao Paulo",
             "state": "SP",
             "country": "BRA",
-            "cost": "15.00"
 
         }
         pg.reference = self.pk
@@ -143,7 +142,7 @@ class Order(models.Model):
                     'description': item.product.name,
                     'quantity': item.quantity,
                     'amount': '%.2f' % item.price,
-                    'weight': '10'
+                    'weight': '1000'
                 }
             )
         return pg
