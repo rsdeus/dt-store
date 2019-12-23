@@ -123,7 +123,16 @@ class Order(models.Model):
         }
         pg.reference_prefix = ''
         pg.shipping = {
-            'type': pg.SEDEX
+            "type": pg.SEDEX,
+            "street": "Av Brig Faria Lima",
+            "number": 1234,
+            "complement": "5 andar",
+            "district": "Jardim Paulistano",
+            "postal_code": "06650030",
+            "city": "Sao Paulo",
+            "state": "SP",
+            "country": "BRA"
+
         }
         pg.reference = self.pk
         for item in self.items.all():
