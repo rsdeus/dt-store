@@ -188,4 +188,4 @@ try:
 except ImportError:
     django_heroku.settings(locals())
     DATABASES['default'] = dj_database_url.config()
-    DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql_postgis'
+    DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
