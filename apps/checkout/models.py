@@ -122,7 +122,9 @@ class Order(models.Model):
             'email': self.user.email
         }
         pg.reference_prefix = ''
-        pg.shipping = None
+        pg.shipping = {
+            'type': pg.SEDEX
+        }
         pg.reference = self.pk
         for item in self.items.all():
             pg.items.append(
