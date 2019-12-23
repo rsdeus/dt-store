@@ -142,6 +142,7 @@ class Order(models.Model):
                     'description': item.product.name,
                     'quantity': item.quantity,
                     'amount': '%.2f' % item.price
+                    'weight': '10'
                 }
             )
         return pg
