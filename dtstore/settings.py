@@ -25,8 +25,9 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
-WSGI_APPLICATION = config('WSGI_APPLICATION')
-ROOT_URLCONF = config('ROOT_URLCONF')
+
+WSGI_APPLICATION='dtstore.wsgi.application'
+ROOT_URLCONF='dtstore.urls'
 
 ALLOWED_HOSTS = []
 
