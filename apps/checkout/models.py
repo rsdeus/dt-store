@@ -141,7 +141,7 @@ class Order(models.Model):
                     'id': item.product.pk,
                     'description': item.product.name,
                     'quantity': item.quantity,
-                    'amount': '%.2f' % item.price
+                    'amount': '%.2f' % item.price,
                     'weight': '10'
                 }
             )
