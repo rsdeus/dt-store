@@ -142,7 +142,7 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 EMAIL_HOST = ''
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
-DEFAULT_FROM_EMAIL = 'admin@djangoecommerce.com'
+DEFAULT_FROM_EMAIL = 'admin@dtstore.com'
 
 # auth
 LOGIN_URL = 'login'
