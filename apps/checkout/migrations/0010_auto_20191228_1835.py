@@ -17,6 +17,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='order',
             name='shipping_methods',
-            field=models.ForeignKey(on_delete='CASCADE', to='checkout.ShippingMethods', verbose_name='Opção de Entrega'),
+            field=models.ForeignKey(on_delete='CASCADE', to='checkout.ShippingMethods', verbose_name='Opção de Entrega', null=True),
         ),
     ]
