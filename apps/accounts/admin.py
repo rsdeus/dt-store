@@ -38,7 +38,7 @@ class UserAdmin(BaseUserAdmin):
             'fields': ['phone']
         }),
         ('Permissões', {
-            'fields': ['is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions']
+            'fields': ['profile', 'is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions']
         }),
     ]
     ordering = ['email']

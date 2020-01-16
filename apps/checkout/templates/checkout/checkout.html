@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load utils %}
+
 {% block title %}
 Finalização da Compra
 {% endblock %}
@@ -15,13 +17,35 @@ Finalização da Compra
 </div>
 <div class="row">
     <div class="col-md-12">
-        <p> Pedido #{{ order.pk }} </p>
+        <h4><p> Pedido #{{ order.pk }} </p></h4>
+        <table class="table table-bordered">
+            <thead>
+                <th>Produto</th>
+                <th>Preço (R$)</th>
+                <th>Quantidade</th>
+                <th>Total (R$)</th>
+            </thead>
+            <tbody>
+            {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.product }}</td>
+                    <td>{{ item.price }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{% calculate_total_per_product item.price item.quantity %}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="col-md-12" align="right">
+            <p> Situação: {{ order.get_payment_status_display }}</p>
+            <p> Forma de Entrega: {{ order.get_shipping_method_display }}</p>
+            <p> Data de Retirada: {{ order.shipping_pickup_day }}</p>
+            <p> Frete: R$ {{ order.shipping_cost|floatformat:"2" }}</p>
+            <h4><p> Total: R$ {{ order.total_order|floatformat:"2" }}</p></h4>
+        </div>
     </div>
     <div class="col-md-4 col-md-offset-2">
         <a href="{% url 'checkout:pagseguro-view' order.pk %}" class="btn btn-success">Pagar com Pagseguro</a>
-    </div>
-    <div class="col-md-4">
-        <a href="#" class="btn btn-primary">Pagar com Paypal</a>
     </div>
     <div class="col-md-4 col-md-offset-2">
         <a href="{% url 'checkout:payment-on-delivery' order.pk %}" class="btn btn-success">Pagamento na Entrega</a>

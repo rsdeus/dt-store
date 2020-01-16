@@ -8,8 +8,10 @@ from . import views
 app_name = 'accounts'
 
 urlpatterns = [
-    path('', views.IndexView.as_view(template_name='accounts/index.html'), name='index'),
+    path('', views.IndexView.as_view(template_name = 'accounts/index.html'), name='index'),
     path('registro/', views.RegisterView.as_view(template_name='accounts/register.html'), name='register'),
     path('alterar-dados/', views.UpdateUserView.as_view(), name='update-user'),
     path('alterar-senha/', views.UpdatePasswordView.as_view(), name='update-password'),
+    path('alterar-endereco/', views.UpdateUserAddressView.as_view(), name='update-address'),
+
 ]

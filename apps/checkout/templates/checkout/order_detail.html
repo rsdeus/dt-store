@@ -1,30 +1,42 @@
 {% extends "accounts/index.html" %}
 
+{% load utils %}
+
 {% block title %}
 Pedido #{{ order.pk }}
 {% endblock %}
 
 {% block accounts_container %}
-<h2>Pedido #{{ order.pk }}</h2>
-<dl class="dl-horizontal">
-    <dt>Total R$</dt>
-    <dd>{{ object.total|floatformat:"2" }}</dd>
-    <dt>Situação</dt>
-    <dd>{{ object.get_status_display }}</dd>
-    <dt>Data</dt>
-    <dd>{{ object.created|date:"d/m/Y H:i" }}</dd>
-    <dt>Meio de Pagamento</dt>
-    <dd>{{ object.get_payment_option_display }}</dd>
-</dl>
-<h3>Itens do Pedido</h3>
-{% for item in object.items.all %}
-    <dl class="dl-horizontal">
-        <dt>Produto</dt>
-        <dd>{{ item.product }}</dd>
-        <dt>Quantidade</dt>
-        <dd>{{ item.quantity }}</dd>
-        <dt>Preço</dt>
-        <dd>R$ {{ item.price|floatformat:"2" }}</dd>
-    </dl>
-{% endfor %}
+<div class="col-md-12">
+        <h4><p> Pedido #{{ order.pk }} </p></h4>
+        <table class="table table-bordered">
+            <thead>
+                <th>Produto</th>
+                <th>Preço (R$)</th>
+                <th>Quantidade</th>
+                <th>Total (R$)</th>
+            </thead>
+            <tbody>
+            {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.product }}</td>
+                    <td>{{ item.price }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{% calculate_total_per_product item.price item.quantity %}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="col-md-12" align="right">
+            <p> Total Compra: R$ {{ order.total|floatformat:"2" }}</p>
+            <p> Situação: {{ order.get_payment_status_display }}</p>
+            <p> Forma de Entrega: {{ order.get_shipping_method_display }}</p>
+            <p> Data de Retirada: {{ order.shipping_pickup_day }}</p>
+            <p> Frete: R$ {{ order.shipping_cost|floatformat:"2" }}</p>
+            <h4><p> Total: R$ {{ order.total_order|floatformat:"2" }}</p></h4>
+        </div>
+    </div>
+    <div class="col-md-12" align="right">
+            <a href="{% url 'checkout:payment' order.pk %}" class="btn btn-success">Finalizar Compra</a>
+    </div>
 {% endblock %}

@@ -1,8 +1,6 @@
 from django.db import models
-
 from django.urls import reverse
-
-# Create your models here.
+from django.contrib import messages
 
 
 class Partner(models.Model):
@@ -53,13 +51,14 @@ class Product(models.Model):
 
     name = models.CharField('Nome', max_length=100)
     slug = models.SlugField('Identificador', max_length=100)
-    bar_code = models.CharField('Código de Barras', max_length=100, blank=True, null=True)
+    code = models.CharField('Código do Produto', max_length=100, blank=True, null=True)
     category = models.ForeignKey('catalog.Category', verbose_name='Categoria', on_delete=models.SET_NULL, null=True, blank=True)
 
     short_description = models.TextField('Descrição Curta', max_length=255, blank=True)
     description = models.TextField('Descrição', blank=True)
 
-    price = models.DecimalField('Preço', decimal_places=2, max_digits=8)
+    price = models.DecimalField('Preço', decimal_places=2, max_digits=8, default=0)
+    weight = models.DecimalField('Peso', decimal_places=2, max_digits=8, default=0)
 
     created = models.DateTimeField('Criado em', auto_now_add=True)
     modified = models.DateTimeField('Modificado em', auto_now=True)
@@ -71,6 +70,7 @@ class Product(models.Model):
 
     image = models.ImageField('Imagem', upload_to='products_imagens', blank=True, null=True)
 
+
     class Meta:
         verbose_name = 'Produto'
         verbose_name_plural = 'Produtos'
@@ -81,3 +81,9 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse('catalog:product', kwargs={'slug': self.slug})
+
+    def save(self, *args, **kwargs):
+        if self.stock < 0:
+            return 'Produto não disponível nessa quantidade'
+        else:
+            super().save(*args, **kwargs)

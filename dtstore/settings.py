@@ -86,6 +86,17 @@ TEMPLATES = [
     },
 ]
 
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+
+
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
@@ -175,6 +186,29 @@ MASSAGE_TAGS = {
 PAGSEGURO_TOKEN = 'A3FD5C2DA0464EA9A597D4F7ADA1909A'
 PAGSEGURO_EMAIL = 'rsdeus@gmail.com'
 PAGSEGURO_SANDBOX = True
+
+# SHIPPING METHODS CONFIG
+
+FIXED_PRICE = 0.00
+
+AVAILABLE_PICKUP_DAYS = (
+    ('none', 'Escolha o dia da retirada'),
+    ('segunda', 'Segunda'),
+    ('terça', 'Terça'),
+)
+
+# Period the order will be holded
+PICKUP_DAYS_TIMEOUT = 3
+
+# Period to post an order in mail
+PERIOD_TO_POST_ORDER = 2
+
+POSTAL_CODE_FROM = '13082752'
+
+PICKUP_ADDRESS = 'Rua Mata da Tijuca, 46 - Bosque de Barão Geraldo - Campinas - SP'
+
+# Expire time setting for clear the left orders and carts in minutes
+EXPIRE_TIME = 1
 
 # Thumbnails
 THUMBNAIL_ALIASES = {

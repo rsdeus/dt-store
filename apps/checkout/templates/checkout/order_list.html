@@ -18,7 +18,10 @@ Meus Pedidos
                 Produtos
             </th>
             <th>
-                Situação
+                Situação Pagamento
+            </th>
+            <th>
+                Situação Entrega
             </th>
             <th>
                 Data
@@ -37,7 +40,10 @@ Meus Pedidos
                 {% endfor %}
             </td>
             <td>
-                {{ order.get_status_display }}
+                {{ order.get_payment_status_display }}
+            </td>
+            <td>
+                {{ order.get_shipping_status_display }}
             </td>
             <td>
                 {{ order.created|date:"d/m/Y" }}

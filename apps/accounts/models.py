@@ -44,15 +44,21 @@ class UserManager(BaseUserManager):
 
 
 class UserAddress(Address):
-    pass
+    is_billing_address = models.BooleanField('Endereço de Cobrança', default=True)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    
+    PROFILE = [
+        ('Customer', 'Cliente'),
+        ('Vendor', 'Vendedor'),
+        ('Administrator', 'Administrador')
+    ]
 
     email = models.EmailField('E-mail', unique=True)
     first_name = models.CharField('Nome', max_length=100, blank=True)
     last_name = models.CharField('Sobrenome', max_length=100, blank=True)
-    # profile = model.CharField('Perfil') :TODO estudar sobre permissões e criar perfis, customer e vendor
+    profile = models.CharField('Perfil', max_length=100, choices=PROFILE, default='Customer')
     is_staff = models.BooleanField('Equipe', default=False)
     is_active = models.BooleanField('Ativo', default=True)
     date_joined = models.DateTimeField('Data de Entrada', auto_now_add=True)
@@ -71,3 +77,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.first_name or self.username
+    
+    def get_postal_code(self):
+        return self.shipping_address.postal_code

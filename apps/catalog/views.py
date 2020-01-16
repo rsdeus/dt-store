@@ -2,6 +2,8 @@
 
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
+from django.contrib import messages
+
 
 from .models import Product, Category
 
@@ -12,7 +14,6 @@ class ProductListView(generic.ListView):
     template_name = 'catalog/product_list.html'
     context_object_name = 'product_list'
     paginate_by = 3
-
 
 product_list = ProductListView.as_view()
 
@@ -28,6 +29,8 @@ class CategoryListView(generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(CategoryListView, self).get_context_data(**kwargs)
         context['current_category'] = get_object_or_404(Category, slug=self.kwargs['slug'])
+        messages.info(self.request, self.request.session['teste'])
+
         return context
 
 
