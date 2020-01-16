@@ -320,7 +320,7 @@ class PagSeguroView(LoginRequiredMixin, RedirectView):
         order = get_object_or_404(
             Order.objects.filter(user=self.request.user), pk=order_pk
         )
-        payment = PaymentMethods.objects.get(order=order)
+        payment = PaymentMethods.objects.create(order=order)
         pg = payment.pagseguro()
         pg.redirect_url = self.request.build_absolute_uri(
             reverse('checkout:order-detail', args=[order.pk])
