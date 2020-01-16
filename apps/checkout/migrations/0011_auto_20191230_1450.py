@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             name='PaymentMethods',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('payment_option', models.CharField(choices=[('deposit', 'Depósito'), ('pagseguro', 'PagSeguro'), ('paypal', 'Paypal'), ('pagamento_entrega', 'Pagamento na Entrega')], default='deposit', max_length=20, verbose_name='Opção de Pagamento')),
+                ('payment_option', models.CharField(choices=[('deposit', 'Depósito'), ('', 'PagSeguro'), ('paypal', 'Paypal'), ('pagamento_entrega', 'Pagamento na Entrega')], default='deposit', max_length=20, verbose_name='Opção de Pagamento')),
             ],
         ),
         migrations.RenameField(
