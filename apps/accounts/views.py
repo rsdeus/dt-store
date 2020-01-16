@@ -81,8 +81,9 @@ class UpdateUserAddressView(LoginRequiredMixin, UpdateView):
         if user:
             user.shipping_address = self.object
 
-        if self.object.is_billing_address:
-            user.billing_address = self.object
+        # TODO: Implementar billing_address
+        # if self.object.is_billing_address:
+        #     user.billing_address = self.object
 
         try:
             user.save()
