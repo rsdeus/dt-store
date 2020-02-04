@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% load widget_tweaks %}
 
 {% load utils %}
@@ -21,24 +23,24 @@ Cesta de Compras
     {% if empty_cart_item %}
         <div class="col-md-12" align="center">
             <p class="text-right">
-                <a href="{% url 'catalog:product_list' %}" class="pull-left btn btn-default"> Cesta de compras vazia, vá para Página de Produtos</a>
+                <a href="{% url 'catalog:product_list' %}" class="pull-left btn btn-default"> Cesta de compras vazia, clique para Página de Produtos</a>
             </p>
         </div>
     {% else %}
-    <form class="" action="" method="post">
-        {% csrf_token %}
-        {{ cart_item_formset.management_form }}
+        <form class="" action="" method="POST" id="cart-item-update">
+            {% csrf_token %}
+            {{ cart_item_formset.management_form }}
         <div class="col-md-12" align="center">
-        <p class="text-right">
-            <a href="{% url 'catalog:product_list' %}" class="pull-left btn btn-default">Continuar Compras</a>
-            <button type="submit" class="btn btn-primary" name="CartUpdate" value="cart_item_update">Atualizar Cesta</button></li>
-        </p>
+           <p class="text-right">
+               <a href="{% url 'catalog:product_list' %}" class="pull-left btn btn-default">Continuar Compras</a>
+               <button type="submit" class="btn btn-primary" name="CartUpdate" value="cart_item_update">Atualizar Cesta</button></li>
+           </p>
         </div>
         <table class="table table-bordered">
             <thead>
                 <th>Produto</th>
                 <th>Preço</th>
-                <th style="width: 10%;">Quantidade</th>
+                <th style="width: 5%;">Quantidade</th>
                 <th>Total</th>
                 <th></th>
             </thead>
@@ -65,77 +67,26 @@ Cesta de Compras
                 {% endfor %}
             </tbody>
         </table>
-
+        </form>
         <div class="col-md-12" align="right">
             <h4>Total Na Cesta - R$ {{ total_cart_item|floatformat:"2" }}</h4>
         </div>
-
-        <form class="" action="" method="post">
-            {% csrf_token %}
+        <div class="col-md-12" align="right">
+            <h3>Total da Compra: R$ {{ total|floatformat:"2" }} </h3>
+        </div>
+        {% if can_finish %}
             <div class="col-md-12" align="right">
-                {{ shipping_method_formset.management_form }}
-                {% for shipping_method_form in shipping_method_formset %}
-                <h4>
-                    {{ shipping_method_form }}
-                    <button type="submit" name="ShippingMethod" value="get_shipping_method"  class="btn btn-info btn-sm">OK</button>
-                    {{ shipping_method_form.id }}
-                </h4>
-                {% endfor %}
+                <a href="{% url 'checkout:create-order' %}" class="btn btn-success">Finalizar Compra</a>
             </div>
-
-            {% if selected_shipping_method_formset %}
-                <form class="" action="" method="post">
-                    {% csrf_token %}
-                    <div class="col-md-12" align="right">
-                        {{ selected_shipping_method_formset.management_form }}
-                        {% for selected_shipping_method_form in selected_shipping_method_formset %}
-                        <h4>
-                            {{ selected_shipping_method_form }}
-                            <button type="submit" name="SelectedShippingMethod" value="get_selected_shipping_method"  class="btn btn-info btn-sm">OK</button>
-                            {{ selected_shipping_method_form.id }}
-                        </h4>
-                            {% if user.is_authenticated and selected_shipping_method_formset.prefix == 'delivery_by_correios_shipping_method' %}
-                                <button type="submit" name="ShippingAddressFromUser" value="get_shipping_address_user"  class="btn btn-info btn-sm">Usar Endereço Cadastrado</button>
-                            {% endif %}
-                        {% endfor %}
-                </form>
-                    {% if pickup_address %}
-                        <h4><p> Endereço de Retirada: {{ pickup_address }}</p>
-                    {% elif postal_code %}
-                            <h4>
-
-                                <p> Entrega no endereço de CEP: {{ postal_code }} </p>
-                                <p> {{ shipping_address }}, {{ shipping_number }}  </p>
-                                <p> {{ shipping_neighborhood }} </p>
-                                <p> {{ shipping_city }} - {{ shipping_state }} </p>
-
-                        <h4><p> Tempo estimado de entrega: {{ shipping_time }} dias</p></h4>
-                    {% endif %}
-
-                    {% if msg_error %}
-                        <h4><p> {{ msg_error }}</p>
-                    {% endif %}
-                        <h4><p> Frete: R$ {{ shipping_cost|floatformat:"2" }}</p></h4>
-
-    </div>
-            {% endif %}
-
-        </form>
-
-    </form>
-    <div class="col-md-12" align="right">
-        <h3>Total da Compra: R$ {{ total|floatformat:"2" }} </h3>
-    </div>
-    {% if can_finish %}
-        <div class="col-md-12" align="right">
-            <a href="{% url 'checkout:create-order' %}" class="btn btn-success">Finalizar Compra</a>
-        </div>
-    {% else %}
-        <div class="col-md-12" align="right">
-            <h4><p>Escolha a Forma de Entrega para poder finalizar sua compra</p></h4>
-        </div>
+        {% else %}
+            <div class="col-md-12" align="right">
+                <h4><p>Escolha a Forma de Entrega para poder finalizar sua compra</p></h4>
+            </div>
+        {% endif %}
     {% endif %}
-    {% endif %}
+    </div>
 </div>
-</div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'assets/cart-item-update.js' %}"></script>
 {% endblock %}

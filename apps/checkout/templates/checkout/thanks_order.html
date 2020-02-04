@@ -1,0 +1,48 @@
+{% extends "accounts/index.html" %}
+
+{% load utils %}
+
+{% block title %}
+Compra #{{ order.pk }} finalizada!
+{% endblock %}
+
+{% block accounts_container %}
+<div class="col-md-12">
+        <h4><p> Obrigado por comprar em nossa loja </p></h4>
+
+        <div class="col-md-6" align="right">
+            <h4><p> Detalhes da Compra </p></h4>
+            <p> Total Compra: R$ {{ order.total|floatformat:"2" }}</p>
+            <p> Situação: {{ order.get_payment_status_display }}</p>
+            <p> Forma de Entrega: {{ order.get_shipping_method_display }}</p>
+            {% if order.shipping_pickup_day %}
+                <p> Data de Retirada: {{ order.shipping_pickup_day }}</p>
+            <p> Frete: R$ {{ order.shipping_cost|floatformat:"2" }}</p>
+            <h4><p> Total: R$ {{ order.total_order|floatformat:"2" }}</p></h4>
+            <p> Detalhes: R$ {{ order.details }}</p>
+        </div>
+
+        <div class="col-md-6" align="right">
+            <h4><p> Endereço de Entrega </p></h4>
+            <p>{{ user.shipping_address  }}</p>
+        </div>
+        <table class="table table-bordered">
+            <thead>
+                <th>Produto</th>
+                <th>Preço (R$)</th>
+                <th>Quantidade</th>
+                <th>Total (R$)</th>
+            </thead>
+            <tbody>
+            {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.product }}</td>
+                    <td>{{ item.price }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{% calculate_total_per_product item.price item.quantity %}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

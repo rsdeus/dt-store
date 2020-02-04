@@ -15,6 +15,7 @@ class ProductListView(generic.ListView):
     context_object_name = 'product_list'
     paginate_by = 3
 
+
 product_list = ProductListView.as_view()
 
 
@@ -29,7 +30,6 @@ class CategoryListView(generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(CategoryListView, self).get_context_data(**kwargs)
         context['current_category'] = get_object_or_404(Category, slug=self.kwargs['slug'])
-        messages.info(self.request, self.request.session['teste'])
 
         return context
 

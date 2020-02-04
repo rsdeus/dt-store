@@ -7,14 +7,14 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.conf import settings
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.core.exceptions import ValidationError
 import json
 from django.views.decorators.vary import vary_on_headers
 
 from apps.catalog.models import Product
 
-from apps.checkout.forms import CartItemFormSet, ShippingMethodsFormSet, PickupDayShippingMethodFormSet, DeliveryByCorreiosShippingMethodFormSet, UserShippingAddressFormSet, PaymentMethodFormSet
+from apps.checkout.forms import CartItemFormSet, ShippingMethodsFormSet, PickupStoreShippingMethodFormSet, DeliveryByCorreiosShippingMethodFormSet, UserShippingAddressFormSet, PaymentMethodFormSet
 
 from .models import CartItem, Order, ShippingMethods, PaymentMethods
 
@@ -47,8 +47,6 @@ class CreateCartItemView(View):
                 return HttpResponse(
                     json.dumps({'message': message}), content_type='application/json'
                 )
-            else:
-                messages.info(self.request, 'Produto atualizado com sucesso')
         return redirect('checkout:cart-item')
 
 
@@ -60,7 +58,6 @@ class CartItemView(TemplateView):
         session_key = self.request.session.session_key
         if session_key:
             if post:
-                messages.info(self.request, self.request.POST)
                 cart_item_formset = CartItemFormSet(
                     queryset=CartItem.objects.filter(cart_key=session_key),
                     prefix='cart_item',
@@ -82,23 +79,24 @@ class CartItemView(TemplateView):
                 prefix='shipping_methods',
                 data=self.request.POST or None
             )
+
         else:
             shipping_method_formset = ShippingMethodsFormSet(
                 prefix='shipping_methods'
             )
         return shipping_method_formset
 
-    def get_pickup_day_shipping_method_formset(self, post=True):
+    def get_pickup_store_shipping_method_formset(self, post=True):
         if post:
-            pickup_day_shipping_method_formset = PickupDayShippingMethodFormSet(
-                prefix='pickup_day_shipping_method',
+            pickup_store_shipping_method_formset = PickupStoreShippingMethodFormSet(
+                prefix='pickup_store_shipping_method',
                 data=self.request.POST or None
             )
         else:
-            pickup_day_shipping_method_formset = PickupDayShippingMethodFormSet(
-                prefix='pickup_day_shipping_method'
+            pickup_store_shipping_method_formset = PickupStoreShippingMethodFormSet(
+                prefix='pickup_store_shipping_method'
             )
-        return pickup_day_shipping_method_formset
+        return pickup_store_shipping_method_formset
 
     def get_delivery_by_correios_shipping_method_formset(self, post=True):
         if post:
@@ -129,29 +127,147 @@ class CartItemView(TemplateView):
         session_key = self.request.session.session_key
         if not CartItem.objects.filter(cart_key=session_key).exists():
             context['empty_cart_item'] = True
-        context['cart_item_formset'] = self.get_cart_item_formset(post=False)
+        context['cart_item_formset'] = self.get_cart_item_formset()
+        context['shipping_method_formset'] = self.get_shipping_formset()
+        context['total_cart_item'] = CartItem.objects.total(session_key)
+        context['total'] = context['total_cart_item']
+        context['can_finish'] = False
 
         return context
 
     def post(self, request, *args, **kwargs):
-        context = self.get_context_data()
+        context = self.get_context_data(**kwargs)
         session_key = self.request.session.session_key
-        if self.request.method == 'POST':
-            cart_item_formset = CartItemFormSet(
-                queryset=CartItem.objects.filter(cart_key=session_key),
-                prefix='cart_item',
-                data=self.request.POST
-            )
-            if cart_item_formset.is_valid():
+        shipping_method_formset = self.get_shipping_formset(post=True)
+        shipping_method = shipping_method_formset.cleaned_data[0]['shipping_method']
+        context['shipping_cost'] = 0
+        context['can_finish'] = False
+
+        self.request.session['pickup_address'] = ''
+        self.request.session['pickup_day'] = ''
+        self.request.session['shipping_cost'] = 0
+        self.request.session['shipping_address'] = ''
+        self.request.session['shipping_number'] = ''
+        self.request.session['shipping_neighborhood'] = ''
+        self.request.session['shipping_city'] = ''
+        self.request.session['shipping_state'] = ''
+        self.request.session['postal_code'] = ''
+        self.request.session['shipping_time'] = 0
+
+        cart_item_formset = self.get_cart_item_formset()
+        if cart_item_formset.is_valid():
+            for form in cart_item_formset.deleted_forms:
+                CartItem().stock_manager(
+                    id=form.cleaned_data['id'],
+                    quantity=form.cleaned_data['quantity'],
+                    delete=form.cleaned_data['DELETE']
+                )
+            try:
                 cart_item_formset.save()
-                message = "Cesta Atualizada"
-                return JsonResponse({"success":True, "message":message}, status=200)
+            except ValidationError as e:
+                messages.info(request, e.message)
             else:
-                message = "Falha ao atualizar a Cesta"
-                return JsonResponse({"success": False, "message": message}, status=400)
+                if request.POST.get('CartUpdate') == 'cart_item_update':
+                    messages.success(request, 'Cesta atualizada com sucesso')
+            context['cart_item_formset'] = self.get_cart_item_formset(post=False)
         else:
-            message = "It is not Ajax"
-            return JsonResponse({"success": False, "message": self.request.is_ajax()}, status=400)
+            messages.info(request, "Cesta de compras vazia")
+
+        # Criação do Formset para Seleção da forma de pagamento
+        if shipping_method == 'store_pickup':
+            context['can_finish'] = True
+            selected_shipping_method_formset = self.get_pickup_store_shipping_method_formset(post=False)
+            context['pickup_address'] = ShippingMethods.store_pickup().get_pickup_address()
+            context['shipping_cost'] = ShippingMethods.store_pickup().get_shipping_cost()
+            self.request.session['pickup_address'] = context['pickup_address']
+            self.request.session['shipping_cost'] = context['shipping_cost']
+
+        elif shipping_method in ('delivery_by_correios_sedex', 'delivery_by_correios_pac'):
+            selected_shipping_method_formset = self.get_delivery_by_correios_shipping_method_formset(post=False)
+        else:
+            selected_shipping_method_formset = ''
+
+        context['selected_shipping_method_formset'] = selected_shipping_method_formset
+        self.request.session['shipping_method'] = shipping_method
+
+
+        if request.POST.get('SelectedShippingMethod') == 'get_selected_shipping_method':
+            context['can_finish'] = True
+            if selected_shipping_method_formset.prefix == 'pickup_store_shipping_method':
+                selected_shipping_method_formset = self.get_pickup_store_shipping_method_formset(post=True)
+                self.request.session['pickup_day'] = selected_shipping_method_formset.cleaned_data[0]['pickup_day']
+
+            elif selected_shipping_method_formset.prefix == 'delivery_by_correios_shipping_method':
+                messages.info(request, shipping_method)
+                selected_shipping_method_formset = self.get_delivery_by_correios_shipping_method_formset(post=True)
+                postal_code = selected_shipping_method_formset.cleaned_data[0]['postal_code']
+                calculate_shipping = ShippingMethods.delivery_by_correios().get_calculate_shipping(session_key,
+                                                                                                    shipping_method,
+                                                                                                    settings.POSTAL_CODE_FROM,
+                                                                                                    postal_code
+                                                                                                   )
+                shipping_address = ShippingMethods.delivery_by_correios().get_address_by_postal_code(postal_code)
+
+                self.request.session['shipping_address'] = context[
+                    'shipping_address'] = shipping_address['end']
+                self.request.session['shipping_number'] = context[
+                    'shipping_number'] = ''
+                self.request.session['shipping_neighborhood'] = context[
+                    'shipping_neighborhood'] = shipping_address['bairro']
+                self.request.session['shipping_city'] = context[
+                    'shipping_city'] = shipping_address['cidade']
+                self.request.session['shipping_state'] = context[
+                    'shipping_state'] = shipping_address['uf']
+
+                if isinstance(calculate_shipping, tuple):
+                    shipping_cost, shipping_time = calculate_shipping
+                    self.request.session['shipping_cost'] = context['shipping_cost'] = shipping_cost
+                    self.request.session['shipping_time'] = context['shipping_time'] = shipping_time
+
+                else:
+                    context['msg_error'] = calculate_shipping
+
+                self.request.session['postal_code'] = context['postal_code'] = postal_code
+
+
+        # se o usuário estiver logado mostra a opção de pegar endereço do cadastro
+        if request.POST.get('ShippingAddressFromUser') == 'get_shipping_address_user':
+            postal_code = self.request.user.shipping_address.postal_code
+            if postal_code and self.request.user.is_authenticated:
+                context['can_finish'] = True
+                calculate_shipping = ShippingMethods.delivery_by_correios().get_calculate_shipping(session_key,
+                                                                                                   shipping_method,
+                                                                                                   settings.POSTAL_CODE_FROM,
+                                                                                                   postal_code
+                                                                                                   )
+                self.request.session['shipping_address'] = context[
+                    'shipping_address'] = self.request.user.shipping_address.locality
+                self.request.session['shipping_number'] = context[
+                    'shipping_number'] = self.request.user.shipping_address.street_number
+                self.request.session['shipping_neighborhood'] = context[
+                    'shipping_neighborhood'] = self.request.user.shipping_address.neighborhood
+                self.request.session['shipping_city'] = context[
+                    'shipping_city'] = self.request.user.shipping_address.city
+                self.request.session['shipping_state'] = context[
+                    'shipping_state'] = self.request.user.shipping_address.state
+
+                if isinstance(calculate_shipping, tuple):
+                    shipping_cost, shipping_time = calculate_shipping
+                    self.request.session['shipping_cost'] = context['shipping_cost'] = shipping_cost
+                    self.request.session['shipping_time'] = context['shipping_time'] = shipping_time
+
+                else:
+                    context['msg_error'] = calculate_shipping
+
+                self.request.session['postal_code'] = context['postal_code'] = postal_code
+
+            else:
+                messages.info(self.request, 'Acesse "Minha Conta" e cadastre um CEP válido')
+
+        context['total_cart_item'] = CartItem.objects.total(session_key)
+        context['total'] = context['total_cart_item'] + context['shipping_cost']
+
+        return self.render_to_response(context)
 
 
 class CreateOrderView(LoginRequiredMixin, RedirectView):

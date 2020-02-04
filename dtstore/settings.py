@@ -29,8 +29,6 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 WSGI_APPLICATION='dtstore.wsgi.application'
 ROOT_URLCONF='dtstore.urls'
 
-ALLOWED_HOSTS = []
-
 DATABASES = {'default': {}}
 
 # Application definition
@@ -137,7 +135,7 @@ STATIC_URL = '/static/'
 
 MEDIA_URL = '/media/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -149,12 +147,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 ALLOWED_HOSTS = ['*']
 
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
-
-# E-mail
-EMAIL_HOST = ''
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-DEFAULT_FROM_EMAIL = 'admin@dtstore.com'
 
 # auth
 LOGIN_URL = 'login'
@@ -192,7 +184,6 @@ PAGSEGURO_SANDBOX = True
 FIXED_PRICE = 0.00
 
 AVAILABLE_PICKUP_DAYS = (
-    ('none', 'Escolha o dia da retirada'),
     ('segunda', 'Segunda'),
     ('terça', 'Terça'),
 )
@@ -207,8 +198,24 @@ POSTAL_CODE_FROM = '13082752'
 
 PICKUP_ADDRESS = 'Rua Mata da Tijuca, 46 - Bosque de Barão Geraldo - Campinas - SP'
 
+# Medidas da embalagem para os correios em centímetros
+FORMAT = 1
+LENGTH = 15
+WIDTH = 20
+HEIGHT = 5
+
 # Expire time setting for clear the left orders and carts in minutes
 EXPIRE_TIME = 1
+
+# PAYMENT METHODS CONFIG
+
+BANK_DETAILS = {
+    'Banco': '',
+    'Agencia': '',
+    'Tipo de Conta': '',
+    'Conta': '',
+    'CPF/CNPJ': '',
+}
 
 # Thumbnails
 THUMBNAIL_ALIASES = {

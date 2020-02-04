@@ -12,8 +12,12 @@
             <h3>{{ product }}</h3>
             {{ product.short_description|linebreaks }}
             Preço: {{ product.price }}
-
-            <p><a href="{{ product.get_absolute_url }}" class="btn btn-success" role="button">Detalhes</a> <a href="{% url 'checkout:create-cartitem' product.slug %}" class="btn btn-default" role="button">Adicionar</a></p>
+            <br>
+            Estoque: {{ product.stock }}
+            <p>
+                <a href="{{ product.get_absolute_url }}" class="btn btn-success" role="button">Detalhes</a>
+                <a href="{% url 'checkout:create-cartitem' product.slug %}" class="btn btn-default cart-item-add" role="button">Adicionar</a>
+            </p>
         </div>
     </div>
 </div>

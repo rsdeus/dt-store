@@ -6,7 +6,7 @@
 
 {% block accounts_container %}
     <h2>Alterar Endereço de Entrega</h2>
-    <form class="form-horizontal" action="" method="post">
+    <form class="form-horizontal" action="" method="post" id="user-address-update">
         {% csrf_token %}
         <fieldset>
             {% for field in form %}

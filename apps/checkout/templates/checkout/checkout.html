@@ -44,11 +44,17 @@ Finalização da Compra
             <h4><p> Total: R$ {{ order.total_order|floatformat:"2" }}</p></h4>
         </div>
     </div>
-    <div class="col-md-4 col-md-offset-2">
-        <a href="{% url 'checkout:pagseguro-view' order.pk %}" class="btn btn-success">Pagar com Pagseguro</a>
-    </div>
-    <div class="col-md-4 col-md-offset-2">
-        <a href="{% url 'checkout:payment-on-delivery' order.pk %}" class="btn btn-success">Pagamento na Entrega</a>
-    </div>
+    <form class="" action="" method="post">
+        {% csrf_token %}
+        {{ payment_methods_formset.management_form }}
+        <div class="col-md-12" align="right">
+            {% for payment_methods_form in payment_methods_formset %}
+                {{ payment_methods_form }}
+                <br>
+                <button type="submit" name="PaymentMethod" value="get_payment_method"  class="btn btn-info btn-sm">Confirmar Pagamento</button>
+                {{ payment_methods_form.id }}
+            {% endfor %}
+        </div>
+    </form>
 </div>
 {% endblock %}

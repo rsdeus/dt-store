@@ -24,6 +24,7 @@ from core import views
 urlpatterns = [
     path('', views.IndexView.as_view(template_name='index.html'), name='index'),
     path('contato/', views.contact, name='contact'),
+    path('contato/submit', views.contact_submit, name='contact_submit'),
     path('entrar/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('recuperar-senha/', auth_views.PasswordResetView.as_view(), name='password_reset'),
     path('confimacao-senha/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),

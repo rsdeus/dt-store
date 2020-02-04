@@ -1,61 +1,21 @@
-{% extends "base.html" %}
-
-{% load widget_tweaks %}
-
-{% block title %}
-    Contato | {{ block.super }}
-{% endblock %}
-
-
-{% block container %}
-<div class="page-header">
-    <h1>Fale conosco</h1>
-    <form class="form-horizontal" action="" method="post" id="contactForm">
-        {% csrf_token %}
-        <fieldset>
-            {% for field in form %}
-            <div class="form-group" {% if field.errors %} has-error {% endif %}>
-              <label for="{{ field.auto_id }}" class="col-md-3 control-label">{{ field.label }}</label>
-              <div class="col-md-9">
-                  {% render_field field class='form-control' %}
-                  {% for error in field.errors %}
-                  <span class="help-block">{{ error }}</span>
-                  {% endfor %}
-              </div>
-            </div>
-            {% endfor %}
-            <div class="form-group">
-              <div class="col-md-9 col-md-offset-3">
-                <button type="submit" class="btn btn-primary">Enviar</button>
-              </div>
-            </div>
-        </fieldset>
-    </form>
-</div>
-{% endblock %}
-{% block scripts %}
-<script type="text/javascript">
-$(document).ready(function(){
-   $("#contactForm").submit(function(e){
-	// prevent from normal form behaviour
-	    console.log("form submitted!")
-      	e.preventDefault();
-    	// serialize the form data
-      	var serializedData = $(this).serialize();
-      	$.ajax({
-      		type : 'POST',
-      		url :  "{% url 'contact' %}",
-      		data : serializedData,
-      		success : function(response){
-			//reset the form after successful submit
-      			$("#contactForm")[0].reset();
-      			alert(response.message);
-      		},
-      		error : function(response){
-      			console.log(response)
-      			alert(response.message);
-      		}
-      	});
+$(document).ready(function() {
+    // Submit post on submit
+    $('#cart-item-update').submit(function(event){
+        event.preventDefault();
+        console.log("form submitted!");  // sanity check
+        console.log(xhr.status + ": " + xhr.responseText)
+        $.ajax({
+            url :  "{% url 'checkout:cart-item-update' %}",
+            type: "POST",
+            dataType:"json",
+            data: { $("#cart-item-update").serializeArray() },
+            success: function(response) {
+                alert(response.message);
+                console.log(xhr.status + ": " + xhr.responseText)
+            },
+        });
+        return false;
+    });
 
     // This function gets cookie with a given name
     function getCookie(name) {
@@ -107,7 +67,5 @@ $(document).ready(function(){
             }
         }
     });
-   });
+
 });
-</script>
-{% endblock %}

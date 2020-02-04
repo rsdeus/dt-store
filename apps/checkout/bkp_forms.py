@@ -10,19 +10,39 @@ class CartItemForm(forms.ModelForm):
 
     class Meta:
         model = CartItem
-        fields = ['quantity']
+        fields = ['quantity',]
 
 
 CartItemFormSet = modelformset_factory(CartItem, form=CartItemForm, can_delete=True, extra=0)
 
 
-UserShippingAddressFormSet = modelformset_factory(UserAddress, fields=['street_number',], extra=0)
+class UserShippingAddressForm(forms.Form):
+
+    class Meta:
+        model = UserAddress
+        fields = ['street_number',]
 
 
-ShippingMethodsFormSet = modelformset_factory(ShippingMethods, fields=['shipping_method',], extra=0)
+UserShippingAddressFormSet = modelformset_factory(UserAddress, form=UserShippingAddressForm, extra=0)
 
 
-PickupDayShippingMethodFormSet = modelformset_factory(ShippingMethods, fields=['shipping_pickup_day',], extra=0)
+class ShippingMethodsForm(forms.Form):
+
+    shipping_method = forms.ChoiceField(choices=ShippingMethods.SHIPPING_METHODS)
+    shipping_method.label = 'Formas de Entrega'
+
+
+ShippingMethodsFormSet = formset_factory(form=ShippingMethodsForm)
+
+
+class PickupStoreShippingMethodForm(forms.Form):
+
+    pickup_days = ShippingMethods.store_pickup().available_pickup_days
+    pickup_day = forms.TypedChoiceField(choices=pickup_days)
+    pickup_day.label = 'Dias para Retirada'
+
+
+PickupStoreShippingMethodFormSet = formset_factory(form=PickupStoreShippingMethodForm)
 
 
 class DeliveryByCorreiosShippingMethodForm(forms.Form):
