@@ -7,13 +7,16 @@
     <meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-
+    {% block head %}
+    {% endblock %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-
     <link rel="stylesheet" href="{% static 'assets/bootstrap.min.css' %}" media="screen" />
     <link rel="stylesheet" href="{% static 'assets/custom.min.css' %}" media="screen" />
-
+    {% block style %}
+    {% endblock %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 <body>
     <div class="navbar navbar-default navbar-fixed-top">
@@ -85,8 +88,7 @@
 			</div>
 		</footer>
 	</div>
-    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    {% block scripts %}
+    {% block script %}
     {% endblock %}
 </body>
 </html>

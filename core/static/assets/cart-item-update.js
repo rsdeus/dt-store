@@ -3,18 +3,28 @@ $(document).ready(function() {
     $('#cart-item-update').submit(function(event){
         event.preventDefault();
         console.log("form submitted!");  // sanity check
-        console.log(xhr.status + ": " + xhr.responseText)
+        var serializedData = $(this).serialize();
+        var name = document.activeElement.name;
+        var value = document.activeElement.value;
+        var id = document.activeElement.id;
+        if (value === "on") {
+            serializedData = serializedData + "&" + name + "=" + value
+        }
         $.ajax({
-            url :  "{% url 'checkout:cart-item-update' %}",
             type: "POST",
-            dataType:"json",
-            data: { $("#cart-item-update").serializeArray() },
+            data: serializedData,
             success: function(response) {
-                alert(response.message);
-                console.log(xhr.status + ": " + xhr.responseText)
+                if (value === "on") {
+                    location.reload();
+                } else {
+                    alert(response.message);
+                }
             },
+            error : function(response){
+                alert(response.message);
+      			console.log(response.message)
+      		}
         });
-        return false;
     });
 
     // This function gets cookie with a given name

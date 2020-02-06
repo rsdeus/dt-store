@@ -11,7 +11,7 @@ Cesta de Compras
 {% endblock %}
 
 {% block container %}
-<ol class="breadcrumb">
+<ol class="breadcrumb" xmlns="http://www.w3.org/1999/html">
   <li><a href="{% url 'index' %}">Início</a></li>
   <li class="active">Cesta de Compras</li>
 </ol>
@@ -27,13 +27,12 @@ Cesta de Compras
             </p>
         </div>
     {% else %}
-        <form class="" action="" method="POST" id="cart-item-update">
-            {% csrf_token %}
+        <form id="cart-item-update" method="POST" >{% csrf_token %}
             {{ cart_item_formset.management_form }}
         <div class="col-md-12" align="center">
            <p class="text-right">
                <a href="{% url 'catalog:product_list' %}" class="pull-left btn btn-default">Continuar Compras</a>
-               <button type="submit" class="btn btn-primary" name="CartUpdate" value="cart_item_update">Atualizar Cesta</button></li>
+               <button type="submit" name="cart-update" class="btn btn-primary">Atualizar Carrinho</button>
            </p>
         </div>
         <table class="table table-bordered">
@@ -46,7 +45,7 @@ Cesta de Compras
             </thead>
             <tbody>
                 {% for form in cart_item_formset %}
-                <tr>
+                <tr id="{{ form.prefix }}">
                     <td>
                         {{ form.instance.product }}
                     </td>
@@ -60,7 +59,7 @@ Cesta de Compras
                         R$ {% calculate_total_per_product form.instance.price form.instance.quantity %}
                     </td>
                     <td class="text-center">
-                        <button value="on" type="submit" name="{{ form.DELETE.html_name }}" class="btn btn-danger btn-sm">remover</button>
+                        <button value="on" type="submit" name="{{ form.DELETE.html_name }}" class="btn btn-danger btn-sm" id="{{ form.prefix }}">remover</button>
                         {{ form.id }}
                     </td>
                 </tr>
@@ -87,6 +86,6 @@ Cesta de Compras
     </div>
 </div>
 {% endblock %}
-{% block scripts %}
+{% block script %}
 <script src="{% static 'assets/cart-item-update.js' %}"></script>
 {% endblock %}

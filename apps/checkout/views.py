@@ -136,22 +136,29 @@ class CartItemView(TemplateView):
     def post(self, request, *args, **kwargs):
         context = self.get_context_data()
         session_key = self.request.session.session_key
-        if self.request.method == 'POST':
-            cart_item_formset = CartItemFormSet(
-                queryset=CartItem.objects.filter(cart_key=session_key),
-                prefix='cart_item',
-                data=self.request.POST
-            )
-            if cart_item_formset.is_valid():
-                cart_item_formset.save()
-                message = "Cesta Atualizada"
-                return JsonResponse({"success":True, "message":message}, status=200)
-            else:
-                message = "Falha ao atualizar a Cesta"
-                return JsonResponse({"success": False, "message": message}, status=400)
+        cart_item_formset = CartItemFormSet(
+            queryset=CartItem.objects.filter(cart_key=session_key),
+            prefix='cart_item',
+            data=self.request.POST
+        )
+        if cart_item_formset.is_valid():
+            cart_item_formset.save()
+            logger.info(self.request.POST)
+            message = "Cesta Atualizada"
         else:
-            message = "It is not Ajax"
-            return JsonResponse({"success": False, "message": self.request.is_ajax()}, status=400)
+            message = "Falha ao atualizar a Cesta"
+            logger.info(self.request.POST)
+            
+        logger.info(message)
+        
+        if self.request.is_ajax():
+            return JsonResponse({"message": message})
+        else:
+            message = "Falha na requisição Ajax"
+            context['cart_item_formset'] = cart_item_formset
+            logger.info(message)
+            logger.info(self.request.POST)
+            return self.render_to_response(context)
 
 
 class CreateOrderView(LoginRequiredMixin, RedirectView):
